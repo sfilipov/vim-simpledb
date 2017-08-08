@@ -50,10 +50,9 @@ function! simpledb#ExecuteSql() range
   let query = s:GetQuery(a:firstline, a:lastline)
 
   let querywrapper = s:GetQueryWrapper()
-  if querywrapper == ''
-    let querywrapper = '{query}'
+  if querywrapper =~ '{query}'
+    let query = substitute(escape(querywrapper, '\'), '{query}', escape(query, '\'), '')
   endif
-  let query = substitute(querywrapper, "{query}", query, "")
 
   if len(adapter) > 1 && adapter[1] == 'mysql'
     let cmdline = s:MySQLCommand(conprops, query)
