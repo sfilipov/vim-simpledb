@@ -12,6 +12,20 @@ function! s:GetQuery(first, last)
   return query
 endfunction
 
+function! s:GetQueryWrapper()
+  let query = ''
+  let lines = getline(2, 100)
+  for line in lines
+    let fragment = matchstr(line, '\(.*\)\(--.*\)\?')
+    if !empty(fragment)
+      let query .= substitute(fragment, "\^--\s\*", "", "") . "\n"
+    else
+      break
+    endif
+  endfor
+  return query
+endfunction
+
 function! s:ShowResults()
   let source_buf_nr = bufnr('%')
 
@@ -34,6 +48,12 @@ function! simpledb#ExecuteSql() range
   let adapter = matchlist(conprops, 'db:\(\w\+\)')
   let conprops = substitute(conprops, "db:\\w\\+", "", "")
   let query = s:GetQuery(a:firstline, a:lastline)
+
+  let querywrapper = s:GetQueryWrapper()
+  if querywrapper == ''
+    let querywrapper = '{query}'
+  endif
+  let query = substitute(querywrapper, "{query}", query, "")
 
   if len(adapter) > 1 && adapter[1] == 'mysql'
     let cmdline = s:MySQLCommand(conprops, query)
@@ -62,6 +82,7 @@ function! s:PostgresCommand(conprops, query)
 
   let sql_text = escape(sql_text, '%')
   let cmdline = 'echo -e ' . sql_text . '| psql ' . a:conprops
+
   return cmdline
 endfunction
 
