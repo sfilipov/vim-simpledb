@@ -6,7 +6,7 @@ function! s:GetQuery(first, last)
   for line in lines
     let fragment = matchstr(line, '\(.*\)\(--.*\)\?')
     if !empty(fragment)
-      let query .= fragment . "\n"
+      let query .= fragment . "\r"
     endif
   endfor
   return query
@@ -18,7 +18,7 @@ function! s:GetQueryWrapper()
   for line in lines
     let fragment = matchstr(line, '\(.*\)\(--.*\)\?')
     if !empty(fragment)
-      let query .= substitute(fragment, "\^--\s\*", "", "") . "\n"
+      let query .= substitute(fragment, "\^--\s\*", "", "") . "\r"
     else
       break
     endif
